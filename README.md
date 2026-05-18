@@ -24,7 +24,7 @@ Caveman saves tokens by breaking language — dropped articles, missing verbs, s
 |---|---|---|
 | 🗣️ Normal | "The reason your React component is re-rendering is likely because you're creating a new object reference on each render cycle. When you pass an inline object as a prop, React's shallow comparison sees it as a different object every time, which triggers a re-render. I'd recommend using `useMemo` to memoize the object." | 69 |
 | 🪨 Caveman | "New object ref each render. Inline object prop = new ref = re-render. Wrap in `useMemo`." | 19 |
-| 🤫 Introvert | "The inline object prop creates a new reference each render, triggering re-comparison — wrap it in `useMemo`." | ~18 |
+| 🤫 Introvert | "The inline object prop creates a new reference each render, triggering re-comparison — wrap it in `useMemo`." | ~20 |
 
 > Caveman reads like a stack trace. Introvert reads like a sentence a senior engineer wrote.
 
@@ -34,7 +34,7 @@ Caveman saves tokens by breaking language — dropped articles, missing verbs, s
 |---|---|---|
 | 🗣️ Normal | "Sure! I'd be happy to help you with that. The issue you're experiencing is most likely caused by your authentication middleware not properly validating the token expiry. Let me take a look and suggest a fix." | 42 |
 | 🪨 Caveman | "Bug in auth middleware. Token expiry check use `<` not `<=`. Fix:" | 14 |
-| 🤫 Introvert | "The auth middleware checks expiry with `<` instead of `<=` — change it to `<=`." | ~13 |
+| 🤫 Introvert | "The auth middleware checks expiry with `<` instead of `<=` — change it to `<=`." | ~17 |
 
 > "Token expiry check use `<` not `<=`." — you understand it, but "check use" isn't English. Introvert gives you the same answer in a sentence you could paste into a PR comment.
 
