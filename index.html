@@ -5,56 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0c0a09">
   <title>introvert — say it right. say it once. shut up.</title>
-  <meta name="description" content="A Claude Code skill that cuts ~70% of output tokens while keeping perfect grammar, full readability, and expert accuracy. The readable alternative to caveman.">
+  <meta name="description" content="An AI skill that cuts ~70% of output tokens while keeping perfect grammar, full readability, and expert accuracy. Works with any AI tool that supports skills.">
+  <meta property="og:title" content="introvert — say it right. say it once. shut up.">
+  <meta property="og:description" content="An AI skill that cuts ~70% of output tokens while keeping perfect grammar and full readability. The readable alternative to caveman.">
+  <meta property="og:type" content="website">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --font-sans: 'Outfit', system-ui, sans-serif;
-      --font-mono: 'JetBrains Mono', 'Menlo', monospace;
+      --font-sans:    'Outfit', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'Menlo', monospace;
       --font-display: 'Instrument Serif', Georgia, serif;
-      --radius: 10px;
-      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --radius:       12px;
+      --radius-sm:    8px;
+      --ease:         cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     [data-theme="dark"] {
       --bg:          #0c0a09;
-      --bg-raised:   #181512;
-      --bg-card:     #141110;
+      --bg-raised:   #161210;
+      --bg-card:     #111009;
+      --bg-hover:    #1c1714;
       --fg:          #f5f0eb;
-      --fg-2:        #a39890;
-      --fg-3:        #5c514a;
-      --border:      #2a2320;
-      --border-2:    #1e1a18;
+      --fg-2:        #9a8f87;
+      --fg-3:        #4a413b;
+      --border:      #252019;
+      --border-2:    #1c1814;
       --green:       #4ade80;
-      --green-bg:    rgba(74,222,128,0.07);
+      --green-bg:    rgba(74,222,128,0.08);
       --amber:       #fbbf24;
-      --amber-bg:    rgba(251,191,36,0.07);
+      --amber-bg:    rgba(251,191,36,0.08);
       --red:         #f87171;
-      --red-bg:      rgba(248,113,113,0.06);
-      --code-bg:     #1a1614;
-      --install-bg:  #181512;
+      --red-bg:      rgba(248,113,113,0.07);
+      --code-bg:     #181410;
+      --hero-glow:   rgba(251,191,36,0.045);
     }
 
     [data-theme="light"] {
       --bg:          #fafaf9;
-      --bg-raised:   #f4f0ed;
+      --bg-raised:   #f0ece8;
       --bg-card:     #ffffff;
+      --bg-hover:    #f5f1ee;
       --fg:          #18120e;
-      --fg-2:        #78706a;
+      --fg-2:        #6b5f58;
       --fg-3:        #b5aca6;
       --border:      #e4ddd8;
-      --border-2:    #f0ece9;
+      --border-2:    #ede8e4;
       --green:       #15803d;
-      --green-bg:    rgba(21,128,61,0.06);
+      --green-bg:    rgba(21,128,61,0.07);
       --amber:       #b45309;
-      --amber-bg:    rgba(180,83,9,0.06);
+      --amber-bg:    rgba(180,83,9,0.07);
       --red:         #b91c1c;
-      --red-bg:      rgba(185,28,28,0.05);
-      --code-bg:     #f4f0ed;
-      --install-bg:  #f4f0ed;
+      --red-bg:      rgba(185,28,28,0.06);
+      --code-bg:     #ede8e3;
+      --hero-glow:   rgba(180,83,9,0.04);
     }
 
     html { font-size: 16px; scroll-behavior: smooth; }
@@ -71,405 +77,645 @@
 
     ::selection { background: var(--fg); color: var(--bg); }
 
-    /* ── Theme toggle ── */
-    .theme-toggle {
-      position: fixed; top: 1.25rem; right: 1.25rem; z-index: 200;
-      display: flex; align-items: center; gap: 0;
-      background: var(--bg-raised); border: 1px solid var(--border);
-      border-radius: 50px; padding: .35rem; cursor: pointer;
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      transition: border-color .25s var(--ease);
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 54px;
+      border-bottom: 1px solid transparent;
+      transition: background .3s var(--ease), border-color .3s var(--ease), backdrop-filter .3s;
     }
-    .theme-toggle:hover { border-color: var(--fg-3); }
-    .tog {
-      width: 28px; height: 28px; border-radius: 50%;
+    .nav.scrolled {
+      background: rgba(12,10,9,.82);
+      border-color: var(--border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    [data-theme="light"] .nav.scrolled { background: rgba(250,250,249,.85); }
+    .nav-brand {
+      font-family: var(--font-display); font-size: 1.05rem;
+      letter-spacing: -.02em; color: var(--fg); text-decoration: none;
+      display: flex; align-items: center; gap: .35rem;
+    }
+    .nav-brand .dim { opacity: .3; }
+    .nav-right { display: flex; align-items: center; gap: .4rem; }
+    .nav-link {
+      font-family: var(--font-mono); font-size: .67rem;
+      letter-spacing: .05em; color: var(--fg-2); text-decoration: none;
+      padding: .38rem .75rem; border-radius: 50px;
+      transition: color .2s, background .2s;
+    }
+    .nav-link:hover { color: var(--fg); background: var(--bg-raised); }
+    .theme-btn {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--bg-raised);
       display: flex; align-items: center; justify-content: center;
-      font-size: .78rem; transition: background .25s var(--ease);
-      color: var(--fg-3);
+      font-size: .76rem; cursor: pointer; line-height: 1;
+      transition: border-color .2s, background .2s;
     }
-    .tog.active { background: var(--fg); color: var(--bg); }
+    .theme-btn:hover { border-color: var(--fg-3); }
 
-    /* ── Nav ── */
-    .nav-pill {
-      position: fixed; top: 1.25rem; left: 1.25rem; z-index: 200;
-    }
-    .nav-pill a {
-      display: inline-block;
-      font-family: var(--font-mono); font-size: .68rem; letter-spacing: .07em;
-      color: var(--fg-2); text-decoration: none;
-      background: var(--bg-raised); border: 1px solid var(--border);
-      padding: .45rem 1rem; border-radius: 50px;
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      transition: color .2s, border-color .2s;
-    }
-    .nav-pill a:hover { color: var(--fg); border-color: var(--fg-3); }
+    /* ── LAYOUT ── */
+    .wrap      { max-width: 760px; margin: 0 auto; padding: 0 1.5rem; }
+    .wrap-wide { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
 
-    /* ── Layout ── */
-    .wrap { max-width: 740px; margin: 0 auto; padding: 0 1.5rem; }
-
-    /* ── Hero ── */
+    /* ── HERO ── */
     .hero {
-      padding: 9rem 0 4.5rem;
-      text-align: center;
+      position: relative; padding: 10rem 0 5.5rem; text-align: center; overflow: hidden;
+      background-image: radial-gradient(var(--border) 1px, transparent 1px);
+      background-size: 28px 28px;
     }
-    .hero-emoji {
-      font-size: 2.2rem; margin-bottom: 1.6rem; display: block;
+    .hero::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 60%, var(--bg) 100%);
+      pointer-events: none;
+    }
+    .hero-glow {
+      position: absolute; top: 45%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 650px; height: 500px;
+      background: radial-gradient(ellipse, var(--hero-glow) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-family: var(--font-mono); font-size: .63rem;
+      letter-spacing: .13em; text-transform: uppercase;
+      color: var(--fg-3); border: 1px solid var(--border);
+      padding: .28rem .8rem; border-radius: 50px; margin-bottom: 2.25rem;
       opacity: 0; animation: fadeUp .8s var(--ease) .1s forwards;
+    }
+    .badge-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--green); box-shadow: 0 0 5px var(--green);
+      animation: blink 2.5s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+    .hero-emoji {
+      display: block; font-size: 2.75rem; margin-bottom: 1.1rem;
+      opacity: 0; animation: fadeUp .8s var(--ease) .22s forwards;
     }
     .hero h1 {
       font-family: var(--font-display);
-      font-size: clamp(3rem, 9vw, 5.8rem);
-      font-weight: 400; letter-spacing: -.035em; line-height: 1;
-      margin-bottom: 1.4rem;
-      opacity: 0; animation: fadeUp .9s var(--ease) .25s forwards;
+      font-size: clamp(3.6rem, 10vw, 7.2rem);
+      font-weight: 400; letter-spacing: -.045em; line-height: .92;
+      margin-bottom: 1.65rem;
+      opacity: 0; animation: fadeUp .9s var(--ease) .34s forwards;
     }
-    .hero h1 em { font-style: italic; opacity: .35; }
-    .hero-sub {
-      font-family: var(--font-mono); font-size: .82rem;
-      color: var(--fg-2); letter-spacing: .03em; margin-bottom: 2.5rem;
-      opacity: 0; animation: fadeUp .9s var(--ease) .4s forwards;
+    .hero h1 em { font-style: italic; opacity: .2; }
+    .hero-tagline {
+      font-family: var(--font-mono); font-size: .8rem;
+      color: var(--fg-2); letter-spacing: .04em; margin-bottom: 2.75rem;
+      opacity: 0; animation: fadeUp .9s var(--ease) .46s forwards;
     }
-    .hero-sub .dot { color: var(--fg-3); margin: 0 .4rem; }
-
-    /* ── Install bar ── */
+    .hero-tagline .sep { color: var(--fg-3); margin: 0 .55rem; }
+    .hero-actions {
+      display: flex; flex-direction: column; align-items: center; gap: .9rem;
+      opacity: 0; animation: fadeUp .9s var(--ease) .58s forwards;
+    }
     .install-bar {
       display: inline-flex; align-items: center; gap: .75rem;
-      background: var(--install-bg); border: 1px solid var(--border);
-      border-radius: 50px; padding: .45rem .5rem .45rem 1.35rem;
-      font-family: var(--font-mono); font-size: .78rem;
-      opacity: 0; animation: fadeUp .9s var(--ease) .55s forwards;
+      background: var(--bg-raised); border: 1px solid var(--border);
+      border-radius: 50px; padding: .38rem .38rem .38rem 1.3rem;
+      font-family: var(--font-mono); font-size: .75rem;
       transition: border-color .2s;
     }
     .install-bar:hover { border-color: var(--fg-3); }
-    .install-bar .prompt { color: var(--green); }
+    .install-bar .prompt { color: var(--green); margin-right: .25rem; }
     .install-bar code { color: var(--fg-2); white-space: nowrap; }
-    .install-bar button {
+    .copy-btn {
       background: var(--fg); color: var(--bg); border: none;
-      padding: .38rem .95rem; border-radius: 50px;
-      font-family: var(--font-mono); font-size: .68rem; font-weight: 600;
-      letter-spacing: .02em; cursor: pointer; flex-shrink: 0;
-      transition: opacity .2s;
+      padding: .38rem 1rem; border-radius: 50px;
+      font-family: var(--font-mono); font-size: .63rem; font-weight: 600;
+      letter-spacing: .04em; cursor: pointer; flex-shrink: 0;
+      transition: opacity .2s, background .2s, color .2s;
     }
-    .install-bar button:hover { opacity: .8; }
-    .install-bar button.copied { background: var(--green); color: #0a1a0e; }
+    .copy-btn:hover { opacity: .82; }
+    .copy-btn.copied { background: var(--green); color: #052e16; }
+    .hero-secondary-link {
+      font-family: var(--font-mono); font-size: .7rem;
+      color: var(--fg-3); text-decoration: none; letter-spacing: .04em;
+      transition: color .2s;
+    }
+    .hero-secondary-link:hover { color: var(--fg-2); }
 
-    /* ── Sections ── */
-    .section { padding: 5rem 0; }
-    .sec-label {
-      font-family: var(--font-mono); font-size: .62rem;
-      letter-spacing: .18em; text-transform: uppercase;
-      color: var(--fg-3); margin-bottom: 1.1rem;
+    /* ── METRICS STRIP ── */
+    .metrics-strip {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+    }
+    .metric-cell {
+      padding: 1.9rem 1rem; text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .metric-cell:last-child { border-right: none; }
+    .metric-val {
+      font-family: var(--font-display);
+      font-size: 2.5rem; font-weight: 400;
+      letter-spacing: -.04em; line-height: 1; margin-bottom: .3rem;
+    }
+    .metric-cell:nth-child(1) .metric-val { color: var(--green); }
+    .metric-cell:nth-child(4) .metric-val { color: var(--amber); }
+    .metric-lbl {
+      font-family: var(--font-mono); font-size: .57rem;
+      letter-spacing: .15em; text-transform: uppercase; color: var(--fg-3);
+    }
+
+    /* ── SECTIONS ── */
+    .section { padding: 5.5rem 0; }
+    .divider { height: 1px; background: var(--border); }
+
+    .eyebrow {
+      font-family: var(--font-mono); font-size: .58rem;
+      letter-spacing: .2em; text-transform: uppercase; color: var(--fg-3);
+      display: flex; align-items: center; gap: .65rem; margin-bottom: 1.1rem;
+    }
+    .eyebrow::after {
+      content: ''; height: 1px; background: var(--border); width: 48px; flex-shrink: 0;
     }
     .section h2 {
       font-family: var(--font-display);
-      font-size: clamp(1.75rem, 4vw, 2.4rem);
-      font-weight: 400; letter-spacing: -.025em; line-height: 1.18;
-      margin-bottom: .9rem;
+      font-size: clamp(1.9rem, 4.2vw, 2.85rem);
+      font-weight: 400; letter-spacing: -.03em; line-height: 1.15;
+      margin-bottom: .85rem;
     }
     .section h2 em { font-style: italic; }
-    .sec-desc {
-      font-size: .92rem; color: var(--fg-2);
-      max-width: 540px; line-height: 1.7; margin-bottom: 2.8rem;
+    .sec-body {
+      font-size: .91rem; color: var(--fg-2);
+      max-width: 510px; line-height: 1.75; margin-bottom: 2.75rem;
     }
-    .divider { height: 1px; background: var(--border); }
 
-    /* ── Three-way comparison ── */
-    .comparisons { display: flex; flex-direction: column; gap: 1.5rem; }
+    /* ── PROBLEM ── */
+    .waste-list { display: flex; flex-direction: column; gap: .35rem; margin-bottom: .6rem; }
+    .waste-row {
+      display: flex; align-items: center; gap: 1rem;
+      padding: .6rem 1.1rem; border-radius: var(--radius-sm);
+      background: var(--red-bg); border: 1px solid rgba(248,113,113,.09);
+      font-family: var(--font-mono); font-size: .77rem;
+      transition: background .2s, border-color .2s;
+    }
+    .waste-row:hover { background: rgba(248,113,113,.12); border-color: rgba(248,113,113,.15); }
+    .waste-count { color: var(--red); font-weight: 500; min-width: 6.5ch; text-align: right; flex-shrink: 0; }
+    .waste-phrase {
+      color: var(--fg-3);
+      text-decoration: line-through; text-decoration-color: rgba(248,113,113,.5);
+      text-decoration-thickness: 1.5px;
+    }
+    .waste-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--font-mono); font-size: .72rem;
+      padding: .5rem 1.1rem;
+      color: var(--fg-3);
+    }
+    .waste-footer .total { color: var(--red); font-weight: 500; }
 
+    /* ── COMPARISONS ── */
+    .comp-stack { display: flex; flex-direction: column; gap: 1.1rem; }
     .comp-card {
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: var(--radius); overflow: hidden;
+      transition: border-color .25s, box-shadow .25s;
     }
+    .comp-card:hover {
+      border-color: var(--fg-3);
+      box-shadow: 0 4px 24px rgba(0,0,0,.18);
+    }
+    [data-theme="light"] .comp-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.07); }
     .comp-scenario {
-      padding: .8rem 1.3rem; border-bottom: 1px solid var(--border);
-      font-family: var(--font-mono); font-size: .62rem;
-      letter-spacing: .12em; text-transform: uppercase; color: var(--fg-3);
+      padding: .65rem 1.2rem; border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono); font-size: .58rem;
+      letter-spacing: .15em; text-transform: uppercase; color: var(--fg-3);
     }
-    .comp-row {
-      padding: 1.15rem 1.3rem;
-      border-bottom: 1px solid var(--border-2);
-    }
+    .comp-row { padding: 1.05rem 1.2rem; border-bottom: 1px solid var(--border-2); }
     .comp-row:last-child { border-bottom: none; }
-
-    .comp-header {
+    .comp-top {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: .55rem;
+      margin-bottom: .48rem;
     }
     .comp-who {
-      font-family: var(--font-mono); font-size: .62rem;
-      letter-spacing: .09em; text-transform: uppercase;
-      display: flex; align-items: center; gap: .35rem;
+      font-family: var(--font-mono); font-size: .58rem;
+      letter-spacing: .1em; text-transform: uppercase;
+      display: flex; align-items: center; gap: .3rem;
     }
-    .comp-row.normal  .comp-who { color: var(--fg-3); }
-    .comp-row.caveman .comp-who { color: var(--amber); }
-    .comp-row.intro   .comp-who { color: var(--green); }
-
-    .tok-badge {
-      font-family: var(--font-mono); font-size: .62rem;
-      padding: .18rem .55rem; border-radius: 50px;
+    .r-normal  .comp-who { color: var(--fg-3); }
+    .r-caveman .comp-who { color: var(--amber); }
+    .r-intro   .comp-who { color: var(--green); }
+    .tok-chip {
+      font-family: var(--font-mono); font-size: .58rem;
+      padding: .13rem .5rem; border-radius: 50px;
     }
-    .comp-row.normal  .tok-badge { background: var(--red-bg);   color: var(--red);   }
-    .comp-row.caveman .tok-badge { background: var(--amber-bg); color: var(--amber); }
-    .comp-row.intro   .tok-badge { background: var(--green-bg); color: var(--green); }
-
-    .comp-text {
-      font-size: .86rem; line-height: 1.65; color: var(--fg-2);
-    }
-    .comp-row.intro .comp-text { color: var(--fg); }
+    .r-normal  .tok-chip { background: var(--red-bg);   color: var(--red); }
+    .r-caveman .tok-chip { background: var(--amber-bg); color: var(--amber); }
+    .r-intro   .tok-chip { background: var(--green-bg); color: var(--green); }
+    .comp-text { font-size: .85rem; line-height: 1.65; color: var(--fg-2); }
+    .r-intro .comp-text { color: var(--fg); }
     .comp-text code {
-      font-family: var(--font-mono); font-size: .78rem;
-      background: var(--code-bg); padding: .12em .38em; border-radius: 4px;
+      font-family: var(--font-mono); font-size: .77rem;
+      background: var(--code-bg); padding: .09em .33em; border-radius: 4px;
     }
     .comp-verdict {
-      margin-top: .45rem; font-family: var(--font-mono);
-      font-size: .62rem; font-style: italic; line-height: 1.5;
+      margin-top: .38rem; font-family: var(--font-mono);
+      font-size: .6rem; font-style: italic; line-height: 1.5;
     }
-    .comp-row.caveman .comp-verdict { color: var(--amber); opacity: .75; }
-    .comp-row.intro   .comp-verdict { color: var(--green); opacity: .85; }
+    .r-caveman .comp-verdict { color: var(--amber); opacity: .65; }
+    .r-intro   .comp-verdict { color: var(--green);  opacity: .8; }
 
-    /* ── Comparison table ── */
-    .tbl-wrap {
+    /* ── VS TABLE ── */
+    .vs-wrap {
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: var(--radius); overflow: hidden; margin-top: 2rem;
     }
-    .comp-tbl { width: 100%; border-collapse: collapse; font-size: .84rem; }
-    .comp-tbl thead th {
-      font-family: var(--font-mono); font-size: .6rem;
-      letter-spacing: .14em; text-transform: uppercase;
-      color: var(--fg-3); text-align: left;
-      padding: .95rem 1.2rem; font-weight: 400;
-      border-bottom: 1px solid var(--border);
+    .vs-tbl { width: 100%; border-collapse: collapse; font-size: .83rem; }
+    .vs-tbl thead th {
+      font-family: var(--font-mono); font-size: .57rem;
+      letter-spacing: .17em; text-transform: uppercase;
+      color: var(--fg-3); text-align: left; font-weight: 400;
+      padding: .9rem 1.2rem; border-bottom: 1px solid var(--border);
     }
-    .comp-tbl tbody td {
-      padding: .72rem 1.2rem;
-      border-bottom: 1px solid var(--border-2);
+    .vs-tbl thead th:nth-child(2) { color: var(--amber); }
+    .vs-tbl thead th:nth-child(3) { color: var(--green); }
+    .vs-tbl tbody td {
+      padding: .68rem 1.2rem; border-bottom: 1px solid var(--border-2);
       color: var(--fg-2); vertical-align: top;
     }
-    .comp-tbl tbody tr:last-child td { border-bottom: none; }
-    .comp-tbl tbody td:first-child { color: var(--fg); font-weight: 500; width: 32%; }
-    .comp-tbl tbody td:nth-child(2) { color: var(--amber); }
-    .comp-tbl tbody td:nth-child(3) { color: var(--green); }
+    .vs-tbl tbody tr:last-child td { border-bottom: none; }
+    .vs-tbl tbody td:first-child  { color: var(--fg); font-weight: 500; width: 32%; }
+    .vs-tbl tbody td:nth-child(2) { color: var(--amber); }
+    .vs-tbl tbody td:nth-child(3) { color: var(--green); font-weight: 500; }
+    .vs-tbl tbody tr { transition: background .15s; }
+    .vs-tbl tbody tr:hover td { background: var(--bg-hover); }
 
-    /* ── Waste list ── */
-    .waste-list { display: flex; flex-direction: column; gap: .3rem; margin-top: 2rem; }
-    .waste-item {
-      font-family: var(--font-mono); font-size: .76rem;
-      display: flex; align-items: center; gap: .9rem;
-      padding: .58rem .95rem; background: var(--red-bg); border-radius: 8px;
-    }
-    .waste-item .wcount {
-      color: var(--red); min-width: 5ch;
-      text-align: right; font-weight: 500; flex-shrink: 0;
-    }
-    .waste-item .wphrase {
-      text-decoration: line-through;
-      text-decoration-color: var(--red);
-      color: var(--fg-3);
-    }
-
-    /* ── Stats ── */
-    .stats {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 1px; background: var(--border);
-      border-radius: var(--radius); overflow: hidden; margin-top: 2.5rem;
-    }
-    .stat-cell { background: var(--bg-card); padding: 1.8rem 1rem; text-align: center; }
-    .stat-val {
-      font-family: var(--font-display); font-size: 2.3rem;
-      font-weight: 400; letter-spacing: -.03em; margin-bottom: .25rem;
-    }
-    .stat-cell:first-child .stat-val { color: var(--green); }
-    .stat-lbl {
-      font-family: var(--font-mono); font-size: .58rem;
-      letter-spacing: .12em; text-transform: uppercase; color: var(--fg-3);
-    }
-
-    /* ── Feature grid ── */
+    /* ── FEATURES ── */
     .feat-grid {
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 1px; background: var(--border);
-      border-radius: var(--radius); overflow: hidden; margin-top: 2rem;
+      border-radius: var(--radius); overflow: hidden;
     }
-    .feat-cell { background: var(--bg-card); padding: 1.7rem 1.4rem; }
-    .feat-cell .icon { font-size: 1.25rem; margin-bottom: .7rem; }
-    .feat-cell h3 { font-size: .92rem; font-weight: 500; margin-bottom: .35rem; }
-    .feat-cell p { font-size: .8rem; color: var(--fg-2); line-height: 1.55; }
+    .feat-cell {
+      background: var(--bg-card); padding: 1.85rem 1.65rem;
+      transition: background .2s;
+    }
+    .feat-cell:hover { background: var(--bg-hover); }
+    .feat-icon { font-size: 1.3rem; margin-bottom: .75rem; display: block; }
+    .feat-cell h3 { font-size: .92rem; font-weight: 600; margin-bottom: .38rem; letter-spacing: -.01em; }
+    .feat-cell p  { font-size: .8rem; color: var(--fg-2); line-height: 1.62; }
+    .feat-cell p strong { color: var(--fg); font-weight: 500; }
 
-    /* ── Usage cards ── */
-    .usage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 2rem; }
-    .usage-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 1.4rem;
+    /* ── COMPAT ── */
+    .compat-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem;
     }
-    .usage-card.on { border-color: var(--green-bg); }
-    .usage-card h3 {
-      font-family: var(--font-mono); font-size: .62rem;
-      letter-spacing: .13em; text-transform: uppercase;
+    .compat-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.6rem 1.2rem; text-align: center;
+      transition: border-color .2s, background .2s, transform .2s;
+    }
+    .compat-card:hover { border-color: var(--fg-3); background: var(--bg-hover); transform: translateY(-2px); }
+    .compat-card .cc-icon { font-size: 1.6rem; margin-bottom: .6rem; display: block; }
+    .compat-card h3 { font-size: .88rem; font-weight: 500; margin-bottom: .3rem; }
+    .compat-card p  { font-size: .72rem; color: var(--fg-3); font-family: var(--font-mono); line-height: 1.5; }
+    .compat-note {
+      margin-top: 1.5rem; font-family: var(--font-mono); font-size: .7rem;
+      color: var(--fg-3); text-align: center; line-height: 1.7;
+    }
+    .compat-note code {
+      color: var(--fg-2); background: var(--code-bg);
+      padding: .1em .38em; border-radius: 4px;
+    }
+
+    /* ── USAGE ── */
+    .usage-pair {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin-bottom: 1.1rem;
+    }
+    .usage-box {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.4rem 1.35rem;
+    }
+    .usage-box.is-on { border-color: rgba(74,222,128,.18); }
+    [data-theme="light"] .usage-box.is-on { border-color: rgba(21,128,61,.18); }
+    .usage-box-title {
+      font-family: var(--font-mono); font-size: .58rem;
+      letter-spacing: .15em; text-transform: uppercase;
       color: var(--fg-3); margin-bottom: .9rem;
     }
     .ucmd {
-      font-family: var(--font-mono); font-size: .8rem;
-      color: var(--fg-2); margin-bottom: .38rem;
+      font-family: var(--font-mono); font-size: .79rem;
+      color: var(--fg-2); margin-bottom: .32rem; display: block;
     }
     .ucmd code {
       color: var(--fg); background: var(--code-bg);
-      padding: .12em .38em; border-radius: 4px;
+      padding: .1em .38em; border-radius: 4px;
+    }
+    .cmd-table-wrap {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .cmd-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .cmd-table thead th {
+      font-family: var(--font-mono); font-size: .57rem;
+      letter-spacing: .17em; text-transform: uppercase;
+      color: var(--fg-3); text-align: left; font-weight: 400;
+      padding: .82rem 1.2rem; border-bottom: 1px solid var(--border);
+    }
+    .cmd-table tbody td {
+      padding: .62rem 1.2rem; border-bottom: 1px solid var(--border-2); color: var(--fg-2);
+    }
+    .cmd-table tbody tr:last-child td { border-bottom: none; }
+    .cmd-table tbody td:first-child {
+      font-family: var(--font-mono); color: var(--green); font-size: .77rem; width: 30%;
+    }
+    .cmd-table tbody tr { transition: background .15s; }
+    .cmd-table tbody tr:hover td { background: var(--bg-hover); }
+
+    /* ── BEHAVIOR TABLE ── */
+    .beh-wrap {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; margin-top: 2rem;
+    }
+    .beh-tbl { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .beh-tbl thead th {
+      font-family: var(--font-mono); font-size: .57rem;
+      letter-spacing: .17em; text-transform: uppercase;
+      color: var(--fg-3); text-align: left; font-weight: 400;
+      padding: .82rem 1.2rem; border-bottom: 1px solid var(--border);
+    }
+    .beh-tbl tbody td {
+      padding: .6rem 1.2rem; border-bottom: 1px solid var(--border-2); color: var(--fg-2);
+    }
+    .beh-tbl tbody tr:last-child td { border-bottom: none; }
+    .beh-tbl tbody td:first-child { color: var(--fg); font-weight: 500; width: 32%; }
+    .beh-tbl tbody tr { transition: background .15s; }
+    .beh-tbl tbody tr:hover td { background: var(--bg-hover); }
+
+    /* ── FINAL CTA ── */
+    .cta-section {
+      border-top: 1px solid var(--border);
+      padding: 6.5rem 0; text-align: center;
+    }
+    .cta-section h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2.1rem, 5vw, 3.6rem);
+      font-weight: 400; letter-spacing: -.038em; margin-bottom: .85rem;
+    }
+    .cta-section h2 em { font-style: italic; opacity: .28; }
+    .cta-section .cta-sub {
+      font-size: .88rem; color: var(--fg-2); margin-bottom: 2.5rem;
+      max-width: 340px; margin-left: auto; margin-right: auto;
+    }
+    .cta-group { display: flex; flex-direction: column; align-items: center; gap: .8rem; }
+    .cta-footnote {
+      font-family: var(--font-mono); font-size: .63rem;
+      color: var(--fg-3); letter-spacing: .06em;
     }
 
-    /* ── Footer ── */
-    footer { padding: 4rem 0 2.5rem; text-align: center; }
-    .foot-links { display: flex; justify-content: center; gap: 2rem; margin-bottom: 1.5rem; }
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.25rem 0 1.75rem;
+    }
+    .footer-row {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;
+    }
+    .footer-brand {
+      font-family: var(--font-display); font-size: .95rem;
+      color: var(--fg-2); letter-spacing: -.01em;
+    }
+    .foot-links { display: flex; gap: 1.75rem; flex-wrap: wrap; }
     footer a {
-      font-family: var(--font-mono); font-size: .72rem;
+      font-family: var(--font-mono); font-size: .67rem;
       color: var(--fg-3); text-decoration: none; letter-spacing: .04em;
       transition: color .2s;
     }
     footer a:hover { color: var(--fg); }
     .foot-copy {
-      font-family: var(--font-mono); font-size: .6rem;
-      color: var(--fg-3); opacity: .45; letter-spacing: .1em;
+      text-align: center;
+      font-family: var(--font-mono); font-size: .57rem;
+      color: var(--fg-3); opacity: .38; letter-spacing: .1em;
+      padding-top: 1.5rem; border-top: 1px solid var(--border-2);
     }
 
-    /* ── Animations ── */
+    /* ── ANIMATIONS ── */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(14px); }
+      from { opacity: 0; transform: translateY(18px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     .reveal {
-      opacity: 0; transform: translateY(18px);
+      opacity: 0; transform: translateY(22px);
       transition: opacity .7s var(--ease), transform .7s var(--ease);
     }
     .reveal.in { opacity: 1; transform: none; }
 
-    /* ── Responsive ── */
-    @media (max-width: 620px) {
-      .hero { padding: 7rem 0 3.5rem; }
-      .install-bar {
-        flex-direction: column; border-radius: var(--radius);
-        padding: 1rem; gap: .55rem; width: 100%;
-      }
-      .install-bar button { width: 100%; padding: .55rem; border-radius: 8px; }
-      .stats { grid-template-columns: 1fr 1fr; }
-      .feat-grid { grid-template-columns: 1fr; }
-      .usage-grid { grid-template-columns: 1fr; }
-      .nav-pill { display: none; }
-      .theme-toggle { top: .9rem; right: .9rem; }
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .nav { padding: 0 1rem; }
+      .hero { padding: 7.5rem 0 4rem; }
+      .install-bar { flex-direction: column; border-radius: var(--radius); padding: 1rem; gap: .55rem; width: 100%; }
+      .copy-btn { width: 100%; padding: .52rem; border-radius: 8px; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      .metric-cell { border-right: none; border-bottom: 1px solid var(--border); padding: 1.4rem .75rem; }
+      .metric-cell:nth-child(odd)  { border-right: 1px solid var(--border); }
+      .metric-cell:nth-child(3),
+      .metric-cell:nth-child(4)   { border-bottom: none; }
+      .feat-grid   { grid-template-columns: 1fr; }
+      .usage-pair  { grid-template-columns: 1fr; }
+      .compat-grid { grid-template-columns: 1fr; }
+      .footer-row  { flex-direction: column; align-items: flex-start; }
+      .section h2  { font-size: 1.85rem; }
     }
   </style>
 </head>
 <body>
 
-<div class="theme-toggle" onclick="toggleTheme()" role="button" aria-label="Toggle theme">
-  <div class="tog sun" data-btn="light">☀️</div>
-  <div class="tog moon active" data-btn="dark">🌙</div>
+<!-- ── NAV ── -->
+<nav class="nav" id="mainNav">
+  <a href="#" class="nav-brand">🤫 <span class="dim">introvert</span></a>
+  <div class="nav-right">
+    <a href="https://github.com/DeepakSrinivas8/introvert" class="nav-link" target="_blank" rel="noopener">GitHub ↗</a>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">☀️</button>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        AI Skill · Any Tool · MIT License
+      </div>
+      <span class="hero-emoji">🤫</span>
+      <h1>introvert<em>.</em></h1>
+      <p class="hero-tagline">
+        say it right <span class="sep">·</span>
+        say it once <span class="sep">·</span>
+        shut up
+      </p>
+      <div class="hero-actions">
+        <div class="install-bar">
+          <code><span class="prompt">$</span> claude install-skill DeepakSrinivas8/introvert</code>
+          <button class="copy-btn" onclick="copyInstall(this)">Copy</button>
+        </div>
+        <a href="https://github.com/DeepakSrinivas8/introvert" class="hero-secondary-link" target="_blank" rel="noopener">View on GitHub ↗</a>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="nav-pill">
-  <a href="https://github.com/DeepakSrinivas8/introvert" target="_blank" rel="noopener">GitHub ↗</a>
+<!-- ── METRICS STRIP ── -->
+<div class="metrics-strip reveal">
+  <div class="wrap-wide">
+    <div class="metrics-grid">
+      <div class="metric-cell">
+        <div class="metric-val">~70%</div>
+        <div class="metric-lbl">Tokens saved</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-val">100%</div>
+        <div class="metric-lbl">Readability</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-val">100%</div>
+        <div class="metric-lbl">Accuracy</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-val">0</div>
+        <div class="metric-lbl">Filler words</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="wrap">
 
-  <!-- ── Hero ── -->
-  <div class="hero">
-    <span class="hero-emoji">🤫</span>
-    <h1>introvert<em>.</em></h1>
-    <p class="hero-sub">
-      say it right <span class="dot">·</span>
-      say it once <span class="dot">·</span>
-      shut up
-    </p>
-    <div class="install-bar">
-      <code><span class="prompt">$</span> claude install-skill DeepakSrinivas8/introvert</code>
-      <button onclick="copyInstall(this)">Copy</button>
+  <!-- ── PROBLEM ── -->
+  <div class="section reveal">
+    <div class="eyebrow">01 · The problem</div>
+    <h2>Most LLM output is <em>padding.</em></h2>
+    <p class="sec-body">Every response arrives loaded with tokens that carry zero information. Before a single useful word, the AI has already burned 40+ tokens on pleasantries it was never asked for.</p>
+
+    <div class="waste-list">
+      <div class="waste-row">
+        <span class="waste-count">~8 tok</span>
+        <span class="waste-phrase">"I'd be happy to help you with that"</span>
+      </div>
+      <div class="waste-row">
+        <span class="waste-count">~8 tok</span>
+        <span class="waste-phrase">"Let me take a look at that for you"</span>
+      </div>
+      <div class="waste-row">
+        <span class="waste-count">~7 tok</span>
+        <span class="waste-phrase">"The reason this is happening is because"</span>
+      </div>
+      <div class="waste-row">
+        <span class="waste-count">~8 tok</span>
+        <span class="waste-phrase">"Let me know if you need anything else!"</span>
+      </div>
+      <div class="waste-row">
+        <span class="waste-count">~5 tok</span>
+        <span class="waste-phrase">"That's a great question"</span>
+      </div>
+      <div class="waste-row">
+        <span class="waste-count">~7 tok</span>
+        <span class="waste-phrase">"I would recommend that you consider"</span>
+      </div>
+    </div>
+    <div class="waste-footer">
+      <span>Total wasted before a single useful word</span>
+      <span class="total">~43 tokens — on every response, every session</span>
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- ── Comparisons ── -->
+  <!-- ── COMPARISONS ── -->
   <div class="section reveal">
-    <div class="sec-label">01 · The difference</div>
+    <div class="eyebrow">02 · The difference</div>
     <h2>Normal is verbose.<br>Caveman is <em>blunt.</em><br>Introvert is precise.</h2>
-    <p class="sec-desc">Caveman saves tokens by breaking language — dropped articles, missing verbs, sentence fragments. You get smaller output, but you re-read every line. Introvert cuts only what adds no information. Same signal, no noise, readable on the first pass.</p>
+    <p class="sec-body">Caveman saves tokens by breaking language — dropped articles, missing verbs, sentence fragments. You get smaller output, but you re-read every line. Introvert removes only what adds no information. Same signal, no noise, readable on the first pass.</p>
 
-    <div class="comparisons">
+    <div class="comp-stack">
 
       <div class="comp-card">
         <div class="comp-scenario">Explaining a React re-render</div>
-        <div class="comp-row normal">
-          <div class="comp-header">
-            <span class="comp-who">🗣️ Normal Claude</span>
-            <span class="tok-badge">~69 tokens</span>
+        <div class="comp-row r-normal">
+          <div class="comp-top">
+            <span class="comp-who">🗣️ Normal</span>
+            <span class="tok-chip">~69 tokens</span>
           </div>
           <p class="comp-text">"The reason your React component is re-rendering is likely because you're creating a new object reference on each render cycle. When you pass an inline object as a prop, React's shallow comparison sees it as a different object every time, which triggers a re-render. I'd recommend using <code>useMemo</code> to memoize the object."</p>
         </div>
-        <div class="comp-row caveman">
-          <div class="comp-header">
+        <div class="comp-row r-caveman">
+          <div class="comp-top">
             <span class="comp-who">🪨 Caveman</span>
-            <span class="tok-badge">~19 tokens</span>
+            <span class="tok-chip">~19 tokens</span>
           </div>
           <p class="comp-text">"New object ref each render. Inline object prop = new ref = re-render. Wrap in <code>useMemo</code>."</p>
           <p class="comp-verdict">Reads like a stack trace. You parse it — you don't read it.</p>
         </div>
-        <div class="comp-row intro">
-          <div class="comp-header">
+        <div class="comp-row r-intro">
+          <div class="comp-top">
             <span class="comp-who">🤫 Introvert</span>
-            <span class="tok-badge">~20 tokens</span>
+            <span class="tok-chip">~20 tokens</span>
           </div>
           <p class="comp-text">"The inline object prop creates a new reference each render, triggering re-comparison — wrap it in <code>useMemo</code>."</p>
-          <p class="comp-verdict">Same savings. Reads like a senior engineer wrote it.</p>
+          <p class="comp-verdict">Same savings. Reads like a sentence a senior engineer wrote.</p>
         </div>
       </div>
 
       <div class="comp-card">
         <div class="comp-scenario">Debugging an auth bug</div>
-        <div class="comp-row normal">
-          <div class="comp-header">
-            <span class="comp-who">🗣️ Normal Claude</span>
-            <span class="tok-badge">~42 tokens</span>
+        <div class="comp-row r-normal">
+          <div class="comp-top">
+            <span class="comp-who">🗣️ Normal</span>
+            <span class="tok-chip">~42 tokens</span>
           </div>
           <p class="comp-text">"Sure! I'd be happy to help you with that. The issue you're experiencing is most likely caused by your authentication middleware not properly validating the token expiry. Let me take a look and suggest a fix."</p>
         </div>
-        <div class="comp-row caveman">
-          <div class="comp-header">
+        <div class="comp-row r-caveman">
+          <div class="comp-top">
             <span class="comp-who">🪨 Caveman</span>
-            <span class="tok-badge">~14 tokens</span>
+            <span class="tok-chip">~14 tokens</span>
           </div>
           <p class="comp-text">"Bug in auth middleware. Token expiry check use <code>&lt;</code> not <code>&lt;=</code>. Fix:"</p>
           <p class="comp-verdict">"Token expiry check use `&lt;`" — you get the gist. "Check use" isn't English and you know it.</p>
         </div>
-        <div class="comp-row intro">
-          <div class="comp-header">
+        <div class="comp-row r-intro">
+          <div class="comp-top">
             <span class="comp-who">🤫 Introvert</span>
-            <span class="tok-badge">~17 tokens</span>
+            <span class="tok-chip">~17 tokens</span>
           </div>
-          <p class="comp-text">"The auth middleware checks expiry with <code>&lt;</code> instead of <code>&lt;=</code> — change it to <code>&lt;=</code>."</p>
+          <p class="comp-text">"Auth middleware checks expiry with <code>&lt;</code> instead of <code>&lt;=</code> — change it to <code>&lt;=</code>."</p>
           <p class="comp-verdict">Cause, fix, done. One sentence you could paste directly into a PR comment.</p>
         </div>
       </div>
 
       <div class="comp-card">
-        <div class="comp-scenario">After generating code — what Claude says next</div>
-        <div class="comp-row normal">
-          <div class="comp-header">
-            <span class="comp-who">🗣️ Normal Claude</span>
-            <span class="tok-badge">~48 tokens</span>
+        <div class="comp-scenario">After generating code</div>
+        <div class="comp-row r-normal">
+          <div class="comp-top">
+            <span class="comp-who">🗣️ Normal</span>
+            <span class="tok-chip">~48 tokens</span>
           </div>
           <p class="comp-text">"Here's the implementation for the API endpoint you requested. I've included error handling and input validation. This handles POST requests to create a new user, validates input, checks for duplicates, and hashes the password. Let me know if you'd like me to add anything else!"</p>
         </div>
-        <div class="comp-row caveman">
-          <div class="comp-header">
+        <div class="comp-row r-caveman">
+          <div class="comp-top">
             <span class="comp-who">🪨 Caveman</span>
-            <span class="tok-badge">~10 tokens</span>
+            <span class="tok-chip">~10 tokens</span>
           </div>
           <p class="comp-text">"POST /users. Validation, dedup, hash. Done."</p>
-          <p class="comp-verdict">A telegram. Works, but sounds like a robot filing a report.</p>
+          <p class="comp-verdict">A telegram. Sounds like a robot filing a report.</p>
         </div>
-        <div class="comp-row intro">
-          <div class="comp-header">
+        <div class="comp-row r-intro">
+          <div class="comp-top">
             <span class="comp-who">🤫 Introvert</span>
-            <span class="tok-badge">~12 tokens</span>
+            <span class="tok-chip">~12 tokens</span>
           </div>
           <p class="comp-text">"POST /users endpoint with input validation, duplicate check, and bcrypt hashing."</p>
           <p class="comp-verdict">One sentence you'd write yourself in a commit message.</p>
@@ -478,25 +724,25 @@
 
       <div class="comp-card">
         <div class="comp-scenario">"Should I use Redis here?"</div>
-        <div class="comp-row normal">
-          <div class="comp-header">
-            <span class="comp-who">🗣️ Normal Claude</span>
-            <span class="tok-badge">~40 tokens</span>
+        <div class="comp-row r-normal">
+          <div class="comp-top">
+            <span class="comp-who">🗣️ Normal</span>
+            <span class="tok-chip">~40 tokens</span>
           </div>
           <p class="comp-text">"That's a great question. While there are several approaches you could take, I think the most effective solution would be to use Redis for this particular use case because it handles this kind of access pattern natively and efficiently."</p>
         </div>
-        <div class="comp-row caveman">
-          <div class="comp-header">
+        <div class="comp-row r-caveman">
+          <div class="comp-top">
             <span class="comp-who">🪨 Caveman</span>
-            <span class="tok-badge">~8 tokens</span>
+            <span class="tok-chip">~8 tokens</span>
           </div>
           <p class="comp-text">"Yes. Redis. Handle access pattern native."</p>
-          <p class="comp-verdict">Anyone who has used Caveman has re-read a sentence like this. It works. It shouldn't need re-reading.</p>
+          <p class="comp-verdict">Anyone who has used Caveman has re-read a line like this. It works. It shouldn't need re-reading.</p>
         </div>
-        <div class="comp-row intro">
-          <div class="comp-header">
+        <div class="comp-row r-intro">
+          <div class="comp-top">
             <span class="comp-who">🤫 Introvert</span>
-            <span class="tok-badge">~9 tokens</span>
+            <span class="tok-chip">~9 tokens</span>
           </div>
           <p class="comp-text">"Yes — Redis handles this access pattern natively."</p>
           <p class="comp-verdict">Confident. Correct. Grammatically flawless.</p>
@@ -508,22 +754,24 @@
 
   <div class="divider"></div>
 
-  <!-- ── Side by side ── -->
+  <!-- ── SIDE BY SIDE ── -->
   <div class="section reveal">
-    <div class="sec-label">02 · Side by side</div>
+    <div class="eyebrow">03 · Side by side</div>
     <h2>Quiet, not <em>broken.</em></h2>
-    <p class="sec-desc">Both save tokens. One stays readable. Generated code is unaffected by either skill — the difference is entirely in the prose around it.</p>
+    <p class="sec-body">Both save tokens. One stays readable. Generated code is unaffected by either skill — the difference is entirely in the prose around it.</p>
 
-    <div class="tbl-wrap">
-      <table class="comp-tbl">
-        <thead><tr><th></th><th>🪨 Caveman</th><th>🤫 Introvert</th></tr></thead>
+    <div class="vs-wrap">
+      <table class="vs-tbl">
+        <thead>
+          <tr><th></th><th>🪨 Caveman</th><th>🤫 Introvert</th></tr>
+        </thead>
         <tbody>
           <tr><td>Grammar</td><td>Broken intentionally</td><td>Correct always</td></tr>
           <tr><td>Articles (a / an / the)</td><td>Dropped</td><td>Kept</td></tr>
-          <tr><td>Sentence fragments</td><td>Used throughout</td><td>Never</td></tr>
+          <tr><td>Sentence fragments</td><td>Used throughout</td><td>Never (full: OK where unambiguous)</td></tr>
           <tr><td>Readability</td><td>Requires re-reading</td><td>Instant comprehension</td></tr>
           <tr><td>Personality</td><td>Blunt and comedic</td><td>Quiet and expert</td></tr>
-          <tr><td>Output token savings</td><td>~75%</td><td>~70%</td></tr>
+          <tr><td>Token savings</td><td>~75%</td><td>~70%</td></tr>
           <tr><td>Generated code</td><td>Unchanged</td><td>Unchanged</td></tr>
           <tr><td>Text after code</td><td>Telegram-style fragment</td><td>One clean sentence</td></tr>
           <tr><td>Paste into a PR comment</td><td>Teammates ask what happened</td><td>Teammates think you wrote it</td></tr>
@@ -534,112 +782,162 @@
 
   <div class="divider"></div>
 
-  <!-- ── Why ── -->
+  <!-- ── FEATURES ── -->
   <div class="section reveal">
-    <div class="sec-label">03 · The problem</div>
-    <h2>Most LLM output is <em>padding.</em></h2>
-    <p class="sec-desc">Every response begins with tokens that carry zero information. An introvert doesn't announce they're about to help — they just help.</p>
-
-    <div class="waste-list">
-      <div class="waste-item"><span class="wcount">~8</span><span class="wphrase">"I'd be happy to help you with that"</span></div>
-      <div class="waste-item"><span class="wcount">~8</span><span class="wphrase">"Let me take a look at that for you"</span></div>
-      <div class="waste-item"><span class="wcount">~7</span><span class="wphrase">"The reason this is happening is because"</span></div>
-      <div class="waste-item"><span class="wcount">~8</span><span class="wphrase">"Let me know if you need anything else!"</span></div>
-      <div class="waste-item"><span class="wcount">~5</span><span class="wphrase">"That's a great question"</span></div>
-      <div class="waste-item"><span class="wcount">~7</span><span class="wphrase">"I would recommend that you consider"</span></div>
-    </div>
-
-    <div class="stats">
-      <div class="stat-cell"><div class="stat-val">~70%</div><div class="stat-lbl">Tokens saved</div></div>
-      <div class="stat-cell"><div class="stat-val">100%</div><div class="stat-lbl">Accuracy</div></div>
-      <div class="stat-cell"><div class="stat-val">100%</div><div class="stat-lbl">Readability</div></div>
-      <div class="stat-cell"><div class="stat-val">0</div><div class="stat-lbl">Filler words</div></div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- ── What it does ── -->
-  <div class="section reveal">
-    <div class="sec-label">04 · What it does</div>
+    <div class="eyebrow">04 · What it does</div>
     <h2>Every response, <em>distilled.</em></h2>
 
     <div class="feat-grid">
       <div class="feat-cell">
-        <div class="icon">✂️</div>
+        <span class="feat-icon">✂️</span>
         <h3>No preamble, ever</h3>
         <p>"Sure, I'd be happy to help!" is gone. Every response starts with the answer.</p>
       </div>
       <div class="feat-cell">
-        <div class="icon">🧠</div>
+        <span class="feat-icon">🧠</span>
         <h3>Expert precision</h3>
-        <p>Technical terms stay exact. Polymorphism stays polymorphism. Nothing is dumbed down or paraphrased.</p>
+        <p>Technical terms stay exact. Polymorphism stays polymorphism. Nothing is paraphrased or dumbed down.</p>
       </div>
       <div class="feat-cell">
-        <div class="icon">📐</div>
+        <span class="feat-icon">📐</span>
         <h3>Correct grammar</h3>
-        <p>Full sentences. Proper articles. No fragments. This is a quiet expert — not a caveman.</p>
+        <p>Full sentences. Proper articles. Brevity through precision — not through breaking language.</p>
       </div>
       <div class="feat-cell">
-        <div class="icon">🛡️</div>
+        <span class="feat-icon">🛡️</span>
         <h3>Safety override</h3>
-        <p>Destructive operations and security warnings get full, unambiguous language — then back to quiet.</p>
+        <p>Destructive operations and security warnings get full, unambiguous language — then immediately back to quiet.</p>
+      </div>
+      <div class="feat-cell">
+        <span class="feat-icon">🎚️</span>
+        <h3>Two intensity levels</h3>
+        <p><strong>lite</strong> removes preamble and filler (~35% reduction). <strong>full</strong> also removes hedging and qualifiers (~70% reduction).</p>
+      </div>
+      <div class="feat-cell">
+        <span class="feat-icon">🔁</span>
+        <h3>Session persistent</h3>
+        <p>Active every turn. Does not drift back to verbosity mid-session. Off only when explicitly deactivated.</p>
       </div>
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- ── Usage ── -->
+  <!-- ── COMPAT ── -->
   <div class="section reveal">
-    <div class="sec-label">05 · Usage</div>
+    <div class="eyebrow">05 · Compatibility</div>
+    <h2>Any AI tool. <em>One skill.</em></h2>
+    <p class="sec-body">Introvert is a plain-text skill file — not a plugin, not tied to a single tool. Any AI assistant that accepts skill files or system prompt instructions can use it.</p>
+
+    <div class="compat-grid">
+      <div class="compat-card">
+        <span class="cc-icon">⚡</span>
+        <h3>Claude Code</h3>
+        <p>claude install-skill<br>one command, done</p>
+      </div>
+      <div class="compat-card">
+        <span class="cc-icon">💬</span>
+        <h3>Any Chat UI</h3>
+        <p>Paste skill contents<br>as system prompt</p>
+      </div>
+      <div class="compat-card">
+        <span class="cc-icon">🔧</span>
+        <h3>API / SDK</h3>
+        <p>Include in the<br>system message</p>
+      </div>
+    </div>
+    <p class="compat-note">
+      Copy the contents of <code>introvert.skill</code> into any system prompt field — it works everywhere.
+    </p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── USAGE ── -->
+  <div class="section reveal">
+    <div class="eyebrow">06 · Usage</div>
     <h2>On. Off. Intensity. <em>Nothing else.</em></h2>
 
-    <div class="usage-grid">
-      <div class="usage-card on">
-        <h3>Activate</h3>
-        <div class="ucmd"><code>/introvert</code></div>
-        <div class="ucmd">"introvert mode"</div>
-        <div class="ucmd">"quiet mode"</div>
-        <div class="ucmd">"talk less"</div>
-        <div class="ucmd">"be minimal"</div>
-        <div class="ucmd">"less words"</div>
-        <div class="ucmd">"be concise"</div>
-        <div class="ucmd">"stop rambling"</div>
+    <div class="usage-pair">
+      <div class="usage-box is-on">
+        <div class="usage-box-title">Activate</div>
+        <span class="ucmd"><code>/introvert</code></span>
+        <span class="ucmd">"introvert mode"</span>
+        <span class="ucmd">"quiet mode"</span>
+        <span class="ucmd">"talk less"</span>
+        <span class="ucmd">"be minimal"</span>
+        <span class="ucmd">"less words"</span>
+        <span class="ucmd">"be concise"</span>
+        <span class="ucmd">"stop rambling"</span>
       </div>
-      <div class="usage-card">
-        <h3>Deactivate</h3>
-        <div class="ucmd"><code>/introvert-off</code></div>
-        <div class="ucmd">"stop introvert"</div>
-        <div class="ucmd">"normal mode"</div>
-        <div class="ucmd">"verbose mode"</div>
+      <div class="usage-box">
+        <div class="usage-box-title">Deactivate</div>
+        <span class="ucmd"><code>/introvert-off</code></span>
+        <span class="ucmd">"stop introvert"</span>
+        <span class="ucmd">"normal mode"</span>
+        <span class="ucmd">"verbose mode"</span>
       </div>
     </div>
 
-    <div class="tbl-wrap" style="margin-top:1.2rem">
-      <table class="comp-tbl">
+    <div class="cmd-table-wrap">
+      <table class="cmd-table">
         <thead><tr><th>Command</th><th>Effect</th></tr></thead>
         <tbody>
-          <tr><td><code>/introvert</code></td><td>Activate at full level (default)</td></tr>
-          <tr><td><code>/introvert-lite</code></td><td>Remove filler/preamble, keep hedging (~35% reduction)</td></tr>
-          <tr><td><code>/introvert-full</code></td><td>Remove filler + hedging, fragments OK (~70% reduction)</td></tr>
-          <tr><td><code>/introvert-off</code></td><td>Deactivate — return to normal verbosity</td></tr>
+          <tr><td>/introvert</td><td>Activate at full level (default)</td></tr>
+          <tr><td>/introvert-lite</td><td>Preamble + filler removed, hedging kept (~35% reduction)</td></tr>
+          <tr><td>/introvert-full</td><td>Preamble + filler + hedging removed, fragments OK (~70% reduction)</td></tr>
+          <tr><td>/introvert-off</td><td>Deactivate — return to normal verbosity</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="beh-wrap">
+      <table class="beh-tbl">
+        <thead><tr><th>Situation</th><th>Introvert does</th></tr></thead>
+        <tbody>
+          <tr><td>Explanation</td><td>One sentence. Two only if the concept genuinely requires it.</td></tr>
+          <tr><td>Error / debugging</td><td>Cause then fix. Nothing else.</td></tr>
+          <tr><td>Code generation</td><td>Code block. One summary sentence. Done.</td></tr>
+          <tr><td>Yes/No question</td><td>Answer first. Reason after only if it adds real value.</td></tr>
+          <tr><td>Steps / how-to</td><td>Numbered. One action per step. No commentary between.</td></tr>
+          <tr><td>Destructive ops</td><td>Full clear language. Then immediately back to quiet.</td></tr>
+          <tr><td>Technical terms</td><td>Always exact. Never simplified or paraphrased.</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- ── Footer ── -->
-  <footer>
-    <div class="foot-links">
-      <a href="https://github.com/DeepakSrinivas8/introvert" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://github.com/DeepakSrinivas8/introvert/issues" target="_blank" rel="noopener">Issues</a>
-      <a href="https://github.com/DeepakSrinivas8/introvert/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+</div><!-- /wrap -->
+
+<!-- ── FINAL CTA ── -->
+<div class="cta-section reveal">
+  <div class="wrap">
+    <h2>Start being <em>quiet.</em></h2>
+    <p class="cta-sub">Install in one command. Works immediately. No configuration needed.</p>
+    <div class="cta-group">
+      <div class="install-bar">
+        <code><span class="prompt">$</span> claude install-skill DeepakSrinivas8/introvert</code>
+        <button class="copy-btn" onclick="copyInstall(this)">Copy</button>
+      </div>
+      <span class="cta-footnote">Or copy <code style="font-family:var(--font-mono);font-size:.6rem;background:var(--bg-raised);padding:.08em .35em;border-radius:4px">introvert.skill</code> into any AI tool's system prompt</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="wrap">
+    <div class="footer-row">
+      <div class="footer-brand">🤫 introvert</div>
+      <div class="foot-links">
+        <a href="https://github.com/DeepakSrinivas8/introvert" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/DeepakSrinivas8/introvert/issues" target="_blank" rel="noopener">Issues</a>
+        <a href="https://github.com/DeepakSrinivas8/introvert/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+      </div>
     </div>
     <div class="foot-copy">MIT · 2026 · say it right. say it once. shut up.</div>
-  </footer>
-
-</div><!-- /wrap -->
+  </div>
+</footer>
 
 <script>
   /* ── Theme ── */
@@ -649,7 +947,7 @@
   }
   function applyTheme(t) {
     document.documentElement.setAttribute('data-theme', t);
-    document.querySelectorAll('.tog').forEach(b => b.classList.toggle('active', b.dataset.btn === t));
+    document.getElementById('themeBtn').textContent = t === 'dark' ? '☀️' : '🌙';
     document.querySelector('meta[name="theme-color"]').content = t === 'dark' ? '#0c0a09' : '#fafaf9';
     localStorage.setItem('iv-theme', t);
   }
@@ -661,20 +959,27 @@
   });
   applyTheme(preferredTheme());
 
-  /* ── Copy ── */
+  /* ── Nav scroll glass ── */
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 36);
+  }, { passive: true });
+
+  /* ── Copy install command ── */
   function copyInstall(btn) {
-    navigator.clipboard.writeText('claude install-skill DeepakSrinivas8/introvert')
-      .then(() => {
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
-      });
+    navigator.clipboard.writeText('claude install-skill DeepakSrinivas8/introvert').then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
   }
 
   /* ── Scroll reveal ── */
   const io = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
-  }, { threshold: 0.07 });
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.06 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 </script>
 

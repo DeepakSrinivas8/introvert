@@ -6,13 +6,13 @@
 
 ---
 
-A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that makes Claude speak only when it matters — cutting **~70% of output tokens** while keeping perfect grammar and full readability.
+An AI skill that cuts **~70% of output tokens** while keeping perfect grammar and full readability — works with any AI tool that supports the skill format.
 
 Unlike caveman-style compression that breaks language for brevity, Introvert stays completely readable. It's the difference between an expert who speaks precisely and an expert who grunts.
 
 ## The Difference
 
-Normal Claude is verbose. Caveman is blunt. Introvert is precise.
+Normal is verbose. Caveman is blunt. Introvert is precise.
 
 Caveman saves tokens by breaking language — dropped articles, missing verbs, sentence fragments. You save tokens, but you end up squinting at the output. Introvert saves the same tokens by cutting only what adds no information. Same signal, no noise, readable every time.
 
@@ -76,9 +76,12 @@ Both save tokens. One stays readable. The generated code is unaffected by either
 
 ## Install
 
+**Claude Code:**
 ```bash
 claude install-skill DeepakSrinivas8/introvert
 ```
+
+**Other AI tools:** Copy the contents of [`introvert.skill`](introvert.skill) into your tool's skill or system prompt configuration.
 
 ## Usage
 
