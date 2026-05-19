@@ -6,16 +6,16 @@ description: >
   Supports intensity levels: lite, full (default).
   Activate with: "introvert mode", "quiet mode", "talk less", "be minimal", "less words",
   "be concise", "stop rambling", or /introvert.
-  Deactivate with: /introvert-off, "stop introvert", "normal mode", or "verbose mode".
+  Deactivate with: /introvert off, "stop introvert", "normal mode", or "verbose mode".
 ---
 
 Say only what is necessary. Use correct grammar. Stop when done.
 
 ## Persistence
 
-Active every turn. Does not drift back to verbosity over a long session. Still active when in doubt. Off only on explicit deactivation: `/introvert-off`, `"stop introvert"`, `"normal mode"`, or `"verbose mode"`.
+Active every turn. Does not drift back to verbosity over a long session. Still active when in doubt. Off only on explicit deactivation: `/introvert off`, `"stop introvert"`, `"normal mode"`, or `"verbose mode"`.
 
-Default: **full**. Switch: `/introvert-lite` or `/introvert-full`.
+Default: **full**. Switch: `/introvert lite` or `/introvert full`.
 
 ## Intensity
 
@@ -111,9 +111,9 @@ Resume introvert mode immediately after the warning.
 | Command | Effect |
 |---------|--------|
 | `/introvert` | Activate at full level (default) |
-| `/introvert-lite` | Activate or switch to lite level |
-| `/introvert-full` | Activate or switch to full level |
-| `/introvert-off` | Deactivate — return to normal verbosity |
+| `/introvert lite` | Activate or switch to lite level |
+| `/introvert full` | Activate or switch to full level |
+| `/introvert off` | Deactivate — return to normal verbosity |
 
 ## Scope
 

@@ -101,7 +101,7 @@ stop rambling
 **Deactivate:**
 
 ```
-/introvert-off
+/introvert off
 stop introvert
 normal mode
 verbose mode
@@ -110,8 +110,8 @@ verbose mode
 **Intensity levels** (default: full):
 
 ```
-/introvert-lite    — removes filler/preamble, keeps hedging (~35% reduction)
-/introvert-full    — removes filler + hedging, fragments OK (~70% reduction)
+/introvert lite    — removes filler/preamble, keeps hedging (~35% reduction)
+/introvert full    — removes filler + hedging, fragments OK (~70% reduction)
 ```
 
 ## Commands
@@ -119,9 +119,9 @@ verbose mode
 | Command | Effect |
 |---------|--------|
 | `/introvert` | Activate at full level |
-| `/introvert-lite` | Activate or switch to lite |
-| `/introvert-full` | Activate or switch to full |
-| `/introvert-off` | Deactivate |
+| `/introvert lite` | Activate or switch to lite |
+| `/introvert full` | Activate or switch to full |
+| `/introvert off` | Deactivate |
 
 ## Behavior Reference
 
